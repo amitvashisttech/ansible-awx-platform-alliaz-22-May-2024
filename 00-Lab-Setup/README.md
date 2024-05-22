@@ -21,7 +21,7 @@ vagrant status
 vagrant up 
 ```
 
-###Step 5: Login inside the virtual machine via ssh 
+### Step 5: Login inside the virtual machine via ssh 
 ```
 vagrant ssh master 
 ```
