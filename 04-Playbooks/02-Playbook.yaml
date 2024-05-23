@@ -1,0 +1,29 @@
+---
+
+# This is my first playbook 
+# The below one is my first play
+#
+
+- hosts: web
+  name: "Webserver Deployment"
+  tasks:
+  - name: Install Network Packages 
+    apt: name=net-tools state=present
+
+
+
+
+
+- hosts: all
+  name: "Disable Firewall Deployment"
+  tasks:
+  - name: Disable Firewall Service 
+    service: name=ufw state=stopped
+
+
+
+- hosts: 'web:&prod:!ansible'
+  name: "Tree Deployment"
+  tasks:
+  - name: Install Tree Packages 
+    apt: name=tree state=present

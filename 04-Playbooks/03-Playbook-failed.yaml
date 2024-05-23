@@ -1,0 +1,13 @@
+---
+
+# This is my first playbook 
+# The below one is my first play
+#
+
+- hosts: web
+  tasks:
+  - name: Install Network Packages 
+    apt: name=net-tools state=present
+
+  - name: Install HTTPD Packages 
+    yum: name=httpd state=present
