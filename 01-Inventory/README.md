@@ -89,7 +89,7 @@ ansible 'prod:uat' -i hosts -m ping -u vagrant -k
 ```
 
 
-### Let's excute the operation on all host in the group [uat] & [prod] & exclude the hosts belongs to ansible group:
+### Let's excute the operation on all host in the group [web] & [prod] & exclude the hosts belongs to ansible group:
 ```
 ansible 'prod:&web:!ansible' -i hosts -m ping -u vagrant -k
 ```
