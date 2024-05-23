@@ -111,8 +111,6 @@ df -h
 ansible -i hosts web -m command -a "df -h" -b
 ```
 ### View OS Release Information on Local Machine
-
-
 ```
 cat /etc/os-release
 ```
@@ -120,7 +118,7 @@ cat /etc/os-release
 ```
 cat /etc/*-release
 ```
-###Execute Command to View OS Release Information on Remote Hosts
+### Execute Command to View OS Release Information on Remote Hosts
 
 ```
 ansible -i hosts web -m command -a "cat /etc/*-release" -b
