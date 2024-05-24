@@ -25,4 +25,6 @@
     command: whoami 
     register: myusername
 
-  - debug: var=myusername 
+  - name: Display the command result 
+    debug: 
+      var: myusername.stdout
