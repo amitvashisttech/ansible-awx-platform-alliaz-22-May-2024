@@ -1,0 +1,22 @@
+---
+
+- hosts: web
+  name: "Webserver Deployment"
+  tasks:
+  - name: Install Apache Packages 
+    apt: name=apache2 state=present
+    when: ansible_os_family == "Debian"
+
+
+  - name: Install HTTPD Packages 
+    yum: name=httpd state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Bring the Apache Service
+    service: name=apache2 state=started
+    when: ansible_os_family == "Debian"
+
+
+  - name: Bring the HTTPD Service
+    service: name=httpd state=started
+    when: ansible_os_family == "RedHat"
