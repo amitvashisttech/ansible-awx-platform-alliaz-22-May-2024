@@ -1,0 +1,4 @@
+---
+
+- name: Local Action 
+  local_action: shell echo "Welcome to the Ansible Web Deployment of Remote Nodes:" {{inventory_hostname}} >> /root/local_ansible_action.txt
