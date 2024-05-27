@@ -1,0 +1,6 @@
+---
+- hosts: web
+  name: "WebServer Deployment"
+  roles:
+  - webserver
+  - server-common

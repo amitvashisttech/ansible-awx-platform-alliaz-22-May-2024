@@ -1,0 +1,67 @@
+---
+# tasks file for webserver
+
+- include: local-action.yaml
+
+- name: Install Apache Packages
+  apt: name=apache2 state=present
+  when: ansible_os_family == "Debian"
+
+- name: Install HTTPD Packages
+  yum: name=httpd state=present
+  when: ansible_os_family == "RedHat"
+
+- name: Bring the Apache Service
+  service: name=apache2 state=started
+  when: ansible_os_family == "Debian"
+
+- name: Deploy Custom Apache Config
+  template: src=templates/apache2.conf.j2 dest=/etc/apache2/apache2.conf
+  notify:
+    - Restart Apache
+
+- name: Deploy Custom Apache Port Config
+  template: src=templates/ports.conf.j2 dest=/etc/apache2/ports.conf
+  notify:
+    - Restart Apache
+    - amit
+
+- name: Bring the HTTPD Service
+  service: name=httpd state=started
+  when: ansible_os_family == "RedHat"
+
+- name: Deploy Custom Web Page
+  copy: src=files/index.html dest={{doc_root}}/index.html
+
+- name: Deploy Custom Info Web Template Page
+  template: src=templates/info.j2 dest={{doc_root}}/info.html
+
+- name: Check who am I
+  command: whoami
+  register: myusername
+
+- name: Display the command result
+  debug:
+    var: myusername.stdout
+
+- name: Check Info1.html file exist or not
+  command: ls {{doc_root}}/info1.html
+  register: result
+  ignore_errors: yes
+
+- name: Display the result of Info1 file
+  debug:
+    var: result.stdout
+
+- debug: msg="Unable to locate the info file"
+  when: result is failed
+  ignore_errors: yes
+
+- debug: msg="Able to locate the info file"
+  when: result is succeeded
+  ignore_errors: yes
+
+- name: Deploy Custom Info1 Web Template Page
+  template: src=templates/info.j2 dest={{doc_root}}/info1.html
+
+- include: remote-action.yaml 

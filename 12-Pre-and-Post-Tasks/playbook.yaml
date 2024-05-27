@@ -1,0 +1,11 @@
+---
+
+- hosts: web
+  vars:
+    change_id: "CHANGE-001"
+  pre_tasks:
+  - include: roles/pre-and-post-task/tasks/pre-task.yaml
+  roles: 
+  - server-common  
+  post_tasks:
+  - include: roles/pre-and-post-task/tasks/post-task.yaml

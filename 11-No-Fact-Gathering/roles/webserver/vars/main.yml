@@ -1,0 +1,6 @@
+---
+# vars file for webserver
+doc_root: "/var/www/html"
+user: "Ansible_Role_Webserver"
+myapp: "Apache"
+http_port: 8084

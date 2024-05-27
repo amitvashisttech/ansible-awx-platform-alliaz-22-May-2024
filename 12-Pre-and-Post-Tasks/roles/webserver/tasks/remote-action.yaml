@@ -1,0 +1,5 @@
+---
+
+- name: Remote Action 
+  shell: echo "Following Change has been completed CH-XXXYYY123; Status - Success on Host:" {{inventory_hostname}} >> /tmp/mail.txt 
+  delegate_to: 172.31.0.101 

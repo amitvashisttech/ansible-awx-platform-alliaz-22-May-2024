@@ -1,0 +1,11 @@
+---
+
+- name: Install NTP Client
+  apt: name=ntp state=present
+  when: ansible_os_family == "Debian" 
+
+
+
+- name: Install NTPD Client
+  yum: name=ntpd state=present
+  when: ansible_os_family == "RedHat" 

@@ -1,0 +1,5 @@
+---
+
+- name: Remote Action 
+  shell: echo "Following Change has been completed {{change_id}}; Status - Success on Host:" {{inventory_hostname}} >> /tmp/mail.txt 
+  delegate_to: ansible 
