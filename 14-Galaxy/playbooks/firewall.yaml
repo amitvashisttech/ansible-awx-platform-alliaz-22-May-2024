@@ -1,0 +1,12 @@
+---
+
+- hosts: web
+  name: "Firewall with Pre & Post Tasks"
+  vars:
+    change_id: "CHANGE-001"
+  pre_tasks:
+  - include: roles/pre-and-post-task/tasks/pre-task.yaml
+  roles: 
+  - firewall 
+  post_tasks:
+  - include: roles/pre-and-post-task/tasks/post-task.yaml

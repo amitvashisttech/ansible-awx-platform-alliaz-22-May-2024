@@ -1,0 +1,14 @@
+--- 
+
+- hosts: all 
+  tasks: 
+  - name: Check the HostName of CI 
+    shell: echo "Hostname:" {{inventory_hostname}} >> /tmp/hostname.txt 
+
+
+- import_playbook: playbooks/server-common.yaml
+  tags: common 
+- import_playbook: playbooks/firewall.yaml
+  tags: firewall 
+- import_playbook: playbooks/webserver.yaml
+  tags: webserver 

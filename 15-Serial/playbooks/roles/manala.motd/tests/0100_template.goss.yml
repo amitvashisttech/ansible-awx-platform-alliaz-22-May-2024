@@ -1,0 +1,11 @@
+---
+
+file:
+  /etc/motd:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: "0644"
+    contains:
+      - One of these days, I'm going to cut you into little pieces

@@ -1,0 +1,10 @@
+---
+- hosts: web
+  name: "Server Common Deployment"
+  serial: "50%" 
+  vars:
+    manala_motd_template: "template/cow.j2"
+    manala_motd_message: "Hey Cow.!"
+  roles:
+  - server-common
+  - manala.motd
