@@ -5,7 +5,9 @@ Creating a New Organization
 
 
 
-## An organization has several attributes that may be configured: (./images/01-Orgination-create.png)
+## An organization has several attributes that may be configured: 
+
+![Example](./images/01-Orgination-create.png)
 
 1. Enter the Name for your organization (required).
 2. Enter a Description for the organization.
