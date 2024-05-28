@@ -103,6 +103,7 @@ kubectl get secret awx-demo-admin-password -o jsonpath={.data.password} -n awx |
 ```
 https://<vm-ip>:<nodeport> (port number would be different in your case)
 ```
-Login with username “admin” and password (what you got from Step 12).
+
+14. Login with username “admin” and password (what you got from Step 12).
 
 
