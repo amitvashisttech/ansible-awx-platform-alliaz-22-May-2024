@@ -1,4 +1,4 @@
-Creating a New Organization
+Creating a New User
 
 1. Login -> Left Menu -> Select Access 
 2. You can create a user by selecting the button user.
