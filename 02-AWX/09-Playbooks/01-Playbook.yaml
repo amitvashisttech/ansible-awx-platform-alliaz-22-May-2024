@@ -4,9 +4,9 @@
   name: "Webserver Deployment"
   vars:
     doc_root: "/var/www/html"
-    user: "Amit"
-    myapp: "Apache"
-    http_port: 8083
+    user: "Kubernetes"
+    myapp: "Ansible Automation AWX Platform"
+    http_port: 8084
   tasks:
   - name: Install Apache Packages 
     apt: name=apache2 state=present
