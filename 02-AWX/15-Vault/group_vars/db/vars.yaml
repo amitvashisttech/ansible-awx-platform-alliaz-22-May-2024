@@ -1,0 +1,4 @@
+doc_root: "/var/www/html"
+user: "{{mysecret_username}}"
+myapp: "Ansible Automation AWX Platform"
+http_port: 8084
