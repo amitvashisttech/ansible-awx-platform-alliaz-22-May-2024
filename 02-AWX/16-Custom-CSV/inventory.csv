@@ -1,0 +1,3 @@
+Hostname,IP Address,Group
+host1,192.168.1.1,web
+host2,192.168.1.2,db
