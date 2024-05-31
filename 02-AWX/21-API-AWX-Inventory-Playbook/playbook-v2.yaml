@@ -1,0 +1,76 @@
+---
+- name: Download and process AWX inventory
+  hosts: localhost
+  gather_facts: no
+  vars:
+    awx_host: "http://172.31.0.100:32105"  # Replace with your AWX server URL
+    awx_token: "nbzEhVqTEghwHyR75kG9E9WU5HdDqW"
+    inventory_id: 3  # Replace with your inventory ID
+    temp_output_file: "/tmp/inventory.json"
+    new_inventory_file: "/tmp/new_inventory.yml"
+    new_inventory_name: "AWX API Inventory"  # Replace with your new inventory name
+    organization_id: 2  # Replace with your organization ID
+  
+  tasks:
+    - name: Download inventory from AWX
+      uri:
+        url: "{{ awx_host }}/api/v2/inventories/{{ inventory_id }}/hosts/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+        method: GET
+        validate_certs: no
+        return_content: yes
+      register: inventory_response
+
+    - name: Save inventory to file in readable format
+      copy:
+        content: "{{ inventory_response.json | to_nice_json }}"
+        dest: "{{ temp_output_file }}"
+    
+    - name: Parse the JSON to extract hosts and groups
+      set_fact:
+        hosts: "{{ inventory_response.json.results | map(attribute='name') | list }}"
+        groups: "{{ inventory_response.json.results | map(attribute='group') | list }}"
+
+    - name: Create a new inventory file
+      copy:
+        dest: "{{ new_inventory_file }}"
+        content: |
+          all:
+            hosts:
+          {% for host in hosts %}
+              {{ host }}:
+          {% endfor %}
+            children:
+          {% for group in groups %}
+              {{ group }}:
+                hosts:
+          {% for host in hosts if host in groups %}
+                  {{ host }}:
+          {% endfor %}
+          {% endfor %}
+    
+    - name: Create new inventory in AWX
+      uri:
+        url: "{{ awx_host }}/api/v2/inventories/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'name': new_inventory_name, 'organization': organization_id} | to_json }}"
+        validate_certs: no
+        status_code: 201
+      register: new_inventory_response
+
+    - name: Create new hosts in the new inventory
+      uri:
+        url: "{{ awx_host }}/api/v2/hosts/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'name': item, 'inventory': new_inventory_response.json.id} | to_json }}"
+        validate_certs: no
+        status_code: 201
+      loop: "{{ hosts }}"
+

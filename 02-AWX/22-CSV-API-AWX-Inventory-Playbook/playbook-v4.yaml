@@ -1,0 +1,112 @@
+---
+- name: Create inventory from CSV and upload to AWX
+  hosts: localhost
+  gather_facts: no
+  vars:
+    awx_host: "http://172.31.0.100:32105"  # Replace with your AWX server URL
+    awx_token: "Uqf8ZrHnZzMJtlaDP8UBG1czQQZFS9"
+    new_inventory_name: "CSV Inventory 8"  # Replace with your new inventory name
+    organization_id: 2  # Replace with your organization ID
+    csv_file_path: "hosts.csv"
+    regex_filter: ".*"  # Adjust the regex as needed
+    new_inventory_file: "new_inventory.json"
+  tasks:
+    - name: Read CSV file
+      read_csv:
+        path: "{{ csv_file_path }}"
+      register: csv_data
+
+    - name: Filter hosts using regex
+      set_fact:
+        filtered_hosts: "{{ csv_data.list | selectattr('Hostname', 'match', regex_filter) | list }}"
+
+    - name: Initialize inventory structure
+      set_fact:
+        inventory:
+          all:
+            hosts: {}
+            children: {}
+
+    - name: Add hosts to inventory
+      set_fact:
+        inventory_hosts: "{{ inventory.all.hosts | combine({ item.Hostname: { 'ansible_host': item['IP Address'] } }) }}"
+      loop: "{{ filtered_hosts }}"
+      loop_control:
+        label: "{{ item.Hostname }}"
+
+    - name: Update inventory with hosts
+      set_fact:
+        inventory: >-
+          {{
+            inventory | combine({
+              'all': {
+                'hosts': inventory_hosts
+              }
+            })
+          }}
+
+    - name: Save inventory to file
+      copy:
+        content: "{{ inventory | to_nice_json }}"
+        dest: "{{ new_inventory_file }}"
+
+    - name: Create new inventory in AWX
+      uri:
+        url: "{{ awx_host }}/api/v2/inventories/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'name': new_inventory_name, 'organization': organization_id} | to_json }}"
+        validate_certs: no
+        status_code: 201
+      register: new_inventory_response
+
+    - name: Extract unique groups
+      set_fact:
+        unique_groups: "{{ filtered_hosts | map(attribute='Group') | unique | list }}"
+
+    - name: Create new groups in the new inventory
+      uri:
+        url: "{{ awx_host }}/api/v2/groups/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'name': item, 'inventory': new_inventory_response.json.id} | to_json }}"
+        validate_certs: no
+        status_code: 201
+      loop: "{{ unique_groups }}"
+      loop_control:
+        label: "{{ item }}"
+      register: group_creation_results
+
+    - name: Create new hosts in the new inventory
+      uri:
+        url: "{{ awx_host }}/api/v2/hosts/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'name': item.Hostname, 'inventory': new_inventory_response.json.id, 'variables': {'ansible_host': item['IP Address']} | to_json} | to_json }}"
+        validate_certs: no
+        status_code: 201
+      loop: "{{ filtered_hosts }}"
+      loop_control:
+        label: "{{ item.Hostname }}"
+      register: host_creation_results
+
+    - name: Associate hosts with their groups
+      uri:
+        url: "{{ awx_host }}/api/v2/groups/{{ group_ids[item.Group] }}/hosts/"
+        headers:
+          Authorization: "Bearer {{ awx_token }}"
+          Content-Type: "application/json"
+        method: POST
+        body: "{{ {'id': host_creation_results.results[ansible_loop.index0].json.id} | to_json }}"
+        validate_certs: no
+        status_code: 204
+      loop: "{{ filtered_hosts }}"
+      loop_control:
+        label: "{{ item.Hostname }}"
+
